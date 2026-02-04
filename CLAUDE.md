@@ -1,48 +1,93 @@
 # tmuxを使った部下（サブペイン）管理方法
 
 ## 概要
-リーダー（ペイン1）として、tmuxの2つ目のペイン（ペイン2）で動作する部下のClaude Codeを管理する方法。
+リーダー（ペイン0）として、右側のペインで動作する部下のClaude Codeを管理する方法。
+
+## ペインレイアウト
+```
++------------------+------------------+
+|                  |     部下1        |
+|                  |    (ペイン1)      |
+|     リーダー      +------------------+
+|    (ペイン0)      |     部下2        |
+|                  |    (ペイン2)      |
+|                  +------------------+
+|                  |     部下3        |
+|                  |    (ペイン3)      |
++------------------+------------------+
+  左半分              右半分（上から順）
+```
 
 ## 部下のClaude Code起動方法
+
+### 1人目の部下を追加
 ```bash
-# ペイン2を作成
+# 右側にペインを作成（左右分割）
 tmux splitw -h
-# ペイン2でClaude Codeを起動
+
+# ペイン1でClaude Codeを起動
+tmux send-keys -t 1 "claude --dangerously-skip-permissions" ENTER
+```
+
+### 2人目以降の部下を追加
+```bash
+# 右側の最後のペインを垂直分割（上下分割）
+# ペイン番号は適宜調整（2人目はペイン2、3人目はペイン3...）
+tmux splitw -v -t 1
+
+# 新しいペインでClaude Codeを起動
 tmux send-keys -t 2 "claude --dangerously-skip-permissions" ENTER
+```
+
+### ペイン番号の確認
+```bash
+# 現在のペイン一覧と番号を確認
+tmux list-panes
 ```
 
 ## 部下への指示方法
 **重要**: tmuxでは指示とEnterキーを2回に分けて送信する必要があります。
 
 ```bash
-# 1. まず指示内容を送信
-tmux send-keys -t 2 "指示内容をここに記載"
+# 1. まず指示内容を送信（ペイン番号は部下に応じて変更: 1, 2, 3...）
+tmux send-keys -t 1 "指示内容をここに記載"
 
 # 2. 次にEnterキーを送信して実行
-tmux send-keys -t 2 Enter
+tmux send-keys -t 1 Enter
 ```
 
 ### 例
 ```bash
-tmux send-keys -t 2 "lsの結果を確認してください"
+# 部下1（ペイン1）への指示
+tmux send-keys -t 1 "lsの結果を確認してください"
+tmux send-keys -t 1 Enter
+
+# 部下2（ペイン2）への指示
+tmux send-keys -t 2 "テストを実行してください"
 tmux send-keys -t 2 Enter
 ```
 
 ## 部下からの報告受信方法
-部下には以下の方法で報告させる：
+部下には以下の方法で報告させる（リーダーはペイン0）：
 
 ```bash
 # 部下が実行するコマンド（2段階で送信）
-tmux send-keys -t 1 '# 部下からの報告: メッセージ内容'
-tmux send-keys -t 1 Enter
+tmux send-keys -t 0 '# 部下からの報告: メッセージ内容'
+tmux send-keys -t 0 Enter
 ```
 
 部下にはこの2段階送信の重要性を明確に指示する必要があります。
 
 ## 部下の状態確認方法
 ```bash
-# ペイン2の出力を確認
+# 部下1（ペイン1）の出力を確認
+tmux capture-pane -t 1 -p | tail -20
+
+# 部下2（ペイン2）の出力を確認
 tmux capture-pane -t 2 -p | tail -20
+
+# 全ペインの一覧を確認
+tmux list-panes
 ```
 
 ## 注意事項
