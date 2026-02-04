@@ -48,3 +48,62 @@ tmux capture-pane -t 2 -p | tail -20
 ## 注意事項
 - Enterキーの送信は必ず別のコマンドとして実行する
 - 部下にも同様に2段階送信の必要性を理解させる
+
+---
+
+# 開発ワークフロー
+
+## 作業フロー
+部下に開発タスクを依頼する際は、以下のフローに従う：
+
+### 1. GitHubにissueを立てる
+```bash
+gh issue create --title "タイトル" --body "詳細"
+```
+
+### 2. issueに対応するブランチを作成し、worktreeを作成する
+**重要**: 部下の作業は必ずgit worktreeを使用する
+
+```bash
+# ブランチ名を決定
+BRANCH_NAME="feature/issue-番号-簡潔な説明"
+
+# worktreeを作成（新しいブランチと作業ディレクトリを同時に作成）
+git worktree add ../churatutor-$BRANCH_NAME -b $BRANCH_NAME
+
+# 部下にはworktreeのディレクトリで作業させる
+# 例: ../churatutor-feature/issue-1-add-login
+```
+
+### 3. 部下が作業を行う
+- 部下に指示を出し、**worktreeディレクトリ内で**実装を進めさせる
+- 必要に応じて進捗を確認
+- リーダーのメインディレクトリには影響しない
+
+### 4. 実装完了後、pushしてプルリクエストを作成
+部下に以下を指示：
+- 変更をcommit & push
+- プルリクエストを作成（`gh pr create`）
+- リーダーに報告
+
+### 5. リーダーがプルリクエストを確認
+- 問題があれば → 部下に修正を依頼
+- 問題がなければ → マージする
+
+```bash
+# PRの確認
+gh pr view 番号
+gh pr diff 番号
+
+# マージ
+gh pr merge 番号 --merge
+```
+
+### 6. マージ後のクリーンアップ
+```bash
+# worktreeを削除
+git worktree remove ../churatutor-$BRANCH_NAME
+
+# 不要になったブランチを削除（オプション）
+git branch -d $BRANCH_NAME
+```
