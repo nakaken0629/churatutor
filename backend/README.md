@@ -1,54 +1,100 @@
 # ChuraTutor Backend
 
-FastAPI backend for ChuraTutor application.
+Firebase Cloud Functions backend for ChuraTutor application.
 
 ## Prerequisites
 
-- Python 3.11+
-- [uv](https://docs.astral.sh/uv/) package manager
+- Node.js 20+
+- [Firebase CLI](https://firebase.google.com/docs/cli)
 
 ## Setup
 
 ```bash
 cd backend
 
-# Install uv (if not installed)
-curl -LsSf https://astral.sh/uv/install.sh | sh
+# Install Firebase CLI (if not installed)
+npm install -g firebase-tools
 
-# Create virtual environment and install dependencies
-uv sync
+# Login to Firebase
+firebase login
+
+# Install function dependencies
+cd functions
+npm install
 ```
 
-## Run
+## Local Development
 
 ```bash
-# Development server with hot reload
-uv run uvicorn app.main:app --reload
+cd backend
 
-# Or activate venv first
-source .venv/bin/activate
-uvicorn app.main:app --reload
+# Build TypeScript
+cd functions && npm run build
+
+# Start emulators
+cd .. && firebase emulators:start
+
+# Or use serve command (build + emulators)
+cd functions && npm run serve
 ```
 
-API will be available at http://localhost:8000
+Emulator UI will be available at http://localhost:4000
+
+API endpoints:
+- http://localhost:5001/churatutor/us-central1/api
+- http://localhost:5001/churatutor/us-central1/health
+
+## Project Structure
+
+```
+backend/
+├── firebase.json       # Firebase configuration
+├── .firebaserc         # Firebase project settings
+└── functions/          # Cloud Functions
+    ├── src/
+    │   └── index.ts    # Function definitions
+    ├── package.json
+    └── tsconfig.json
+```
+
+## API Endpoints
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/` | GET | Welcome message |
+| `/api/health` | GET | Health check |
+| `/health` | GET | Standalone health check |
+
+## Deploy
+
+```bash
+cd backend
+
+# Deploy functions only
+firebase deploy --only functions
+
+# Deploy all (functions + hosting)
+firebase deploy
+```
 
 ## Development
 
 ```bash
-# Install with dev dependencies
-uv sync --dev
+cd functions
 
-# Run tests
-uv run pytest
+# Type check and build
+npm run build
 
-# Run linter
-uv run ruff check .
+# Watch mode
+npm run build:watch
 
-# Format code
-uv run ruff format .
+# Lint
+npm run lint
+
+# Fix lint issues
+npm run lint:fix
 ```
 
-## API Documentation
+## Firebase Console
 
-- Swagger UI: http://localhost:8000/docs
-- ReDoc: http://localhost:8000/redoc
+Access your project at: https://console.firebase.google.com/project/churatutor

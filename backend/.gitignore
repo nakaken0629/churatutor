@@ -1,0 +1,21 @@
+# Firebase
+.firebase/
+
+# Dependencies
+node_modules/
+
+# Logs
+*.log
+firebase-debug.log
+firestore-debug.log
+ui-debug.log
+
+# Environment
+.env
+.env.local
+
+# OS
+.DS_Store
+
+# Hosting
+public/
