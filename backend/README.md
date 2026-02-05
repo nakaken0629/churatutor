@@ -23,6 +23,34 @@ cd functions
 npm install
 ```
 
+## Environment Variables
+
+Set the following environment variables for Gemini AI:
+
+### Local Development
+
+Create a `.env` file or set environment variables before running emulators:
+
+```bash
+export GEMINI_API_KEY="your-gemini-api-key"
+```
+
+Or use Firebase Functions config for local emulation:
+```bash
+cd functions
+echo "GEMINI_API_KEY=your-gemini-api-key" > .env
+```
+
+### Production (Firebase)
+
+Set the environment variable using Firebase CLI:
+
+```bash
+firebase functions:secrets:set GEMINI_API_KEY
+```
+
+Get your Gemini API key from: https://makersuite.google.com/app/apikey
+
 ## Local Development
 
 ```bash
@@ -63,7 +91,33 @@ backend/
 |----------|--------|-------------|
 | `/api/` | GET | Welcome message |
 | `/api/health` | GET | Health check |
+| `/api/generate` | POST | Generate text using Gemini AI |
 | `/health` | GET | Standalone health check |
+
+### POST /api/generate
+
+Generate text using Google Gemini AI.
+
+**Request:**
+```json
+{
+  "prompt": "Your question or prompt text"
+}
+```
+
+**Response:**
+```json
+{
+  "response": "Generated text from Gemini AI"
+}
+```
+
+**Example:**
+```bash
+curl -X POST http://localhost:5001/churatutor/us-central1/api/generate \
+  -H "Content-Type: application/json" \
+  -d '{"prompt": "What is the capital of Japan?"}'
+```
 
 ## Deploy
 
