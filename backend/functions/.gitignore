@@ -1,0 +1,21 @@
+# Compiled JavaScript
+lib/
+
+# Dependencies
+node_modules/
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Environment
+.env
+.env.local
+
+# OS
+.DS_Store
