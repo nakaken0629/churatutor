@@ -58,3 +58,26 @@ fastlane/readme.md
 
 # Version control
 vcs.xml
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+ehthumbs.db
+
+# Log files
+*.log
+
+# Crashlytics
+crashlytics.properties
+crashlytics-build.properties
+fabric.properties
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+*~
