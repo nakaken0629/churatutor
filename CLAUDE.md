@@ -103,37 +103,56 @@ tmux list-panes
 ## 作業フロー
 部下に開発タスクを依頼する際は、以下のフローに従う：
 
-### 1. リーダーがGitHubにissueを立てる
+### 1. リーダーがissueを指定して部下に作業を依頼
 ```bash
-gh issue create --title "タイトル" --body "詳細"
+# issueの一覧を確認
+gh issue list
+
+# 部下にissue番号を指定して作業を依頼
 ```
 
-### 2. issueに対応するブランチを作成し、worktreeを作成する
+### 2. 部下がissueを元にブランチを作成
+```bash
+# ブランチ名の命名規則
+BRANCH_NAME="feature/issue-番号-簡潔な説明"
+
+# ブランチを作成
+git branch $BRANCH_NAME
+```
+
+### 3. 部下がworktreeを作成
 **重要**: 部下の作業は必ずgit worktreeを使用する
 
 ```bash
-# ブランチ名を決定
-BRANCH_NAME="feature/issue-番号-簡潔な説明"
+# worktreeを作成（ブランチと作業ディレクトリを紐付け）
+git worktree add ../churatutor-$BRANCH_NAME $BRANCH_NAME
 
-# worktreeを作成（新しいブランチと作業ディレクトリを同時に作成）
-git worktree add ../churatutor-$BRANCH_NAME -b $BRANCH_NAME
-
-# 部下にはworktreeのディレクトリで作業させる
-# 例: ../churatutor-feature/issue-1-add-login
+# worktreeディレクトリに移動して作業
+cd ../churatutor-$BRANCH_NAME
 ```
 
-### 3. 部下が作業を行う
-- 部下に指示を出し、**worktreeディレクトリ内で**実装を進めさせる
-- 必要に応じて進捗を確認
+### 4. 部下がworktree上で作業を行う
+- worktreeディレクトリ内で実装を進める
 - リーダーのメインディレクトリには影響しない
 
-### 4. 実装完了後、pushしてプルリクエストを作成
-部下に以下を指示：
-- 変更をcommit & push
-- プルリクエストを作成（`gh pr create`）
-- リーダーに報告
+### 5. 部下がコミット & プッシュ
+```bash
+git add .
+git commit -m "コミットメッセージ"
+git push -u origin $BRANCH_NAME
+```
 
-### 5. リーダーがプルリクエストを確認
+### 6. 部下がPRを作成してリーダーに報告
+```bash
+# プルリクエストを作成
+gh pr create --title "タイトル" --body "詳細"
+
+# リーダーに報告
+tmux send-keys -t 0 '# 部下からの報告: PR作成完了 URL'
+tmux send-keys -t 0 Enter
+```
+
+### 7. リーダーがプルリクエストを確認
 - 問題があれば → 部下に修正を依頼
 - 問題がなければ → マージする
 
@@ -146,20 +165,19 @@ gh pr diff 番号
 gh pr merge 番号 --merge
 ```
 
-### 6. 部下がマージ後のクリーンアップを行う
+### 8. 部下がマージ後のクリーンアップを行う
 部下に以下を指示：
 - worktreeを削除
 - 不要になったブランチを削除（オプション）
-- 自分のペインを閉じる
 - リーダーに完了報告
 
 ```bash
+# メインディレクトリに戻る
+cd /Users/kenjinakagaki/git/churatutor
+
 # worktreeを削除
 git worktree remove ../churatutor-$BRANCH_NAME
 
 # 不要になったブランチを削除（オプション）
 git branch -d $BRANCH_NAME
-
-# 自分のペインを閉じる
-exit
 ```
